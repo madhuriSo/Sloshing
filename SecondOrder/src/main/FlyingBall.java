@@ -31,7 +31,7 @@ public class FlyingBall implements SecondDerivative {
 
     @Override
     public double GetValue(double t, double y, double v) {
-        double f = (-(mB * g) -(Math.signum( 0.5 * cD * roA * v * v * aB)));
+        double f = (-(mB * g) -(Math.signum(v)* 0.5 * cD * roA * v * v * aB));
         double d2y = f / mB;
         return d2y;
 

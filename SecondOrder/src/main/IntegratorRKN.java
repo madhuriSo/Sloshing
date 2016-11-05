@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IntegratorRKN {
     SecondDerivative secondDerivative;
     double t0, y0, dy0, h;
@@ -15,7 +18,7 @@ public class IntegratorRKN {
         this.d2y0 = d2y0;
     }
 
-    public int Step(double t1, double y1, double dy1,
+    public double[] Step(double t1, double y1, double dy1,
                     double d2y1) {
         double h2 = h * h;
 
@@ -36,7 +39,9 @@ public class IntegratorRKN {
         y0 = y1;
         dy0 = dy1;
         d2y0 = d2y1;
+        double[] arr = {t0, y0, dy0, d2y0};
 
-        return 0;
+        return arr;
+
     }
 }
