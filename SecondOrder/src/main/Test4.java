@@ -1,35 +1,43 @@
 package main;
 
-
-import java.io.Console;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Madhuri on 11/4/16.
  */
 public class Test4 {
-    FlyingBall ball = new FlyingBall();
-    SecondDerivative acceleration = (SecondDerivative) ball;
+    public static void main(String args[]) {
+        FlyingBall ball = new FlyingBall();
+        SecondDerivative acceleration = (SecondDerivative) ball;
+        double t0 = 0;
+        double tmax = 10;
+        double y0 = 0;
+        double h = 0.5;
+        double v0 = 50;
+        double a0 = acceleration.GetValue(t0, y0, v0);
+        IntegratorRKN integratorRKN = new IntegratorRKN(acceleration, t0, y0, v0,
+                h, a0);
 
-    double t0 = 0;
-    double tmax = 10;
-    double y0 = 0;
-    double h = 0.5;
-    double v0 = 50;
-    double a0 = acceleration.GetValue(t0, y0, v0);
-    IntegratorRKN integratorRKN = new IntegratorRKN(acceleration, t0, y0, v0,
-            h, a0);
+        System.out.println("TEST4, equation of motion");
+        System.out.println(" t,s             y,m             v,m/s               a,m/s2");
+        System.out.println("--------------------------------------------------------------");
 
-    System.out.println("Name entered :");
-    Console.WriteLine("TEST4, equation of motion");
-    Console.WriteLine(" t,s     y,m   v,m/s  a,m/s2");
-    Console.WriteLine("----------------------------");
-    Console.WriteLine("{0,4:F1}{1,8:F2}{2,8:F2}{3,8:F2}", t0, y0, v0, a0);
+        System.out.println("\n Time0    \t Position0    \t Velocity   \t   acceleration");
+        System.out.println("\t" +integratorRKN.t0+ " \t   "+integratorRKN.y0+"      \t   " +integratorRKN.dy0+"       \t  " +integratorRKN.d2y0);
 
-    double t, y, v, a;
-    while(t < tmax)
-    {
-        integratorRKN.Step(t, y, v, a);
-        Console.WriteLine("{0,4:F1}{1,8:F2}{2,8:F2}{3,8:F2}", t, y, v, a);
+        double t=t0, y = y0, v=v0, a=a0;
+
+        while (t < tmax) {
+            double[] newValues=integratorRKN.Step(t, y, v, a);
+            System.out.print("\t"+newValues[0]+"\t"+newValues[1]+"\t"+newValues[2]+"\t"+newValues[3]);
+            t=newValues[0];
+            y=newValues[1];
+            v=newValues[2];
+            a=newValues[3];
+            System.out.print("\n");
+
+        }
     }
-    Console.WriteLine();
 }
