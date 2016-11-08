@@ -1,4 +1,7 @@
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IntegratorRKN {
 	SecondDerivative secondDerivative;
     double t0, y0, dy0, h;
@@ -38,5 +41,5 @@ public class IntegratorRKN {
        d2y0 = d2y1;
 
        return this;
-}
+	}
 }

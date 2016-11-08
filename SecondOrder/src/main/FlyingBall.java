@@ -21,6 +21,7 @@ public class FlyingBall implements SecondDerivative {
        aB = 0.25 * Math.PI * dB * dB;
     }
 
+	@Override
     public double getValue(double t, double y, double v)
     {
        double f = -mB * g -Math.signum(v) * 0.5 * cD * roA * v * v * aB;
