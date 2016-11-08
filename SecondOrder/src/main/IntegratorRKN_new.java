@@ -1,13 +1,10 @@
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class IntegratorRKN {
+public class IntegratorRKN_new {
 	SecondDerivative secondDerivative;
     double t0, y0, dy0, h;
     double d2y0;
 
-    public IntegratorRKN(SecondDerivative secondDerivative, double t0, 
+    public IntegratorRKN_new (SecondDerivative secondDerivative, double t0, 
         double y0, double dy0, double h, double d2y0)
     {
        this.secondDerivative = secondDerivative;
@@ -18,7 +15,8 @@ public class IntegratorRKN {
        this.d2y0 = d2y0;
     }
 
-    public IntegratorRKN Step(double t1, double y1, double dy1,  double d2y1)
+    // Different from previous code, t0 will not be updated in this method.
+    public IntegratorRKN_new step(double t, double y, double dy,  double d2y)
     {
        double h2 = h * h; 
 
@@ -30,16 +28,19 @@ public class IntegratorRKN {
        double k4 = secondDerivative.getValue(
            t0 + h,   y0 +   h * dy0 + h2/2 * k3, dy0 +   h * k3);
 
-       t1 = t0 + h;
-       y1 = y0 + h * dy0 + h2/6 * (k1 + k2 + k3);
-       dy1 = dy0 + h/6 * (k1 + 2 * k2 + 2 * k3 + k4);
-       d2y1 = secondDerivative.getValue(t1, y1, dy1);
+       //t = t0 + h;
+       y = y0 + h * dy0 + h2/6 * (k1 + k2 + k3);
+       dy = dy0 + h/6 * (k1 + 2 * k2 + 2 * k3 + k4);
+       d2y = secondDerivative.getValue(t, y, dy);
 
-       t0 = t1;
-       y0 = y1;
-       dy0 = dy1;
-       d2y0 = d2y1;
+       //t0 = t;
+       y0 = y;
+       dy0 = dy;
+       d2y0 = d2y;
 
        return this;
-	}
+}
+    public void updateT0 () {
+    	t0 += h;
+    }
 }
