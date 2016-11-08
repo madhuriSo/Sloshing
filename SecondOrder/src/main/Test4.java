@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by Madhuri on 11/4/16.
- */
+
 public class Test4 {
     public static void main(String args[]) {
         FlyingBall ball = new FlyingBall();
