@@ -11,7 +11,7 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
 
     //Parameters of liquid with respect to time
     int T_MAX=8;
-    double DELTA_T=1.0/512;
+    double DELTA_T=1.0/256;
 
     //Parameter of the tank
     double L=1.0;
@@ -73,8 +73,7 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
         alphaPlusBeta2=getAlphaPlusBeta(ETA,x1_dot,x2_dot,x1,x2);
         fe=getFe(t);
         f=(alphaPlusBeta1 - alphaPlusBeta2) + (cc * x0_dot)- (((2 * cc) + cb) * x1_dot) + (cc * x2_dot) - (kb * x1) + fe;
-        double d2y = f;
-        return d2y;
+        return f;
 	}
 	
     // Calculat Gamma i
