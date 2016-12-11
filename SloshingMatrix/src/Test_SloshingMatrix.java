@@ -6,11 +6,6 @@ public class Test_SloshingMatrix {
 	public static void main(String[] args) {
 
 		Equation_SloshingMatrix sloshingEquation = new Equation_SloshingMatrix();
-
-		SecondDerivative_SloshingMatrix secondDerivative = (SecondDerivative_SloshingMatrix) sloshingEquation;
-		double[][] RKN_result = new double[20][3*(N+1)+1]; //[][3*(N+1)+1], use 20 for testing
-		int indexRow = 0, indexCol = 3; // indexCol does not start from 0 since we need to leave columns for t and x0, xdot0, xdotdot0
-		double [] previousX = new double[9]; // For new equation, we are going to use less previous values. 
 		
 		double t0 = 0;
 		double tMax = sloshingEquation.T_MAX;
@@ -19,13 +14,21 @@ public class Test_SloshingMatrix {
 		double y0 = 0;
 		double v0 = 0;		//dot
 		double a0 = 0;     //value of F(x,xdot)
+		double eta = 0;
+
+		SecondDerivative_SloshingMatrix secondDerivative = (SecondDerivative_SloshingMatrix) sloshingEquation;
 		IntegratorRKN_SloshingMatrix integratorRKN = new IntegratorRKN_SloshingMatrix (secondDerivative, t0, y0, v0, deltaT, a0);
+		
+		double[][] RKN_result = new double[20][3*(N+1)+1]; //[tMax*deltaT+1][3*(N+1)+1], use 20 for testing
+		double[][] etas = new double[20][N+1]; // [tMax*deltaT+1][N-1]to store ETA
+		int indexRow = 0, indexCol = 3; // indexCol does not start from 0 since we need to leave columns for t and x0, xdot0, xdotdot0
+		double [] previousX = new double[9]; // For new equation, we are going to use less previous values. 
+	
 		
 		double[] fData = new double[N-1]; // to build vector F
 		double[][] matrixData = new double[N-1][N-1]; // Matrix M
 		double[] xDDot = new double[N-1]; // to store xDDot for each time interval
 	
-		
 		System.out.println("TEST, equation of motion");
 		System.out.println("     t,s           x0          x0dot       x0dotdot       x1          x1dot       x1dotdot       x2         x2dot        x2dotdot        x3        x3dot       x3dotdot         x4        x4dot        x4dotdot");
 		System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -34,6 +37,9 @@ public class Test_SloshingMatrix {
 		for (int i = 0; i < RKN_result[0].length; i++) {
 			RKN_result[0][i] = 0;
 			//System.out.printf(" %f ", RKN_result[0][i]);
+		}
+		for (int i = 0; i < etas[0].length; i++) {
+			etas[0][i] = 0;
 		}
 		//System.out.println();
 		//System.out.println();
@@ -48,9 +54,12 @@ public class Test_SloshingMatrix {
 			
 			RKN_result[indexRow][0] = t;
 			//System.out.printf(" %f ", t);
+			etas[indexRow][0] = t;
 			
 			// get x, xdot
 			for (int j = 1; j <= (N-1); j++) { 
+				double yPrevious = integratorRKN.y0; // to calculate ETA
+				
 				integratorRKN.step(t, y, v, a, previousX);
 				t = integratorRKN.t0;
 				y = integratorRKN.y0;
@@ -65,6 +74,10 @@ public class Test_SloshingMatrix {
 				
 				// store F value
 				fData[j-1] = a;
+				
+				// calculate and store ETA
+				eta = sloshingEquation.getEta(y, y0);
+				etas[indexRow][j] = eta;
 				
 				// get all 9 values for next inner loop
 				previousX = getPreviousXValues(RKN_result, i, j);
@@ -102,7 +115,9 @@ public class Test_SloshingMatrix {
 			for (int k = 0; k < xDDot.length; k++) {
 				RKN_result[i][6 + k * 3] = xDDot[k];
 			}
-
+			
+			// the nth eta
+			etas[i][N] = sloshingEquation.getEta(0, integratorRKN.dy0);
 			
 			// Update t0 and go to next row of the array, which is also next time interval
 			integratorRKN.updateT0();
@@ -122,7 +137,18 @@ public class Test_SloshingMatrix {
 			}
 			System.out.println();
 		}
-
+		
+		
+		System.out.println("\n        t           eta1        eta2         eta3         eta4");
+		System.out.println("------------------------------------------------------------");
+		
+		for (int i=0; i<etas.length; i++) {
+			for (int j=0; j<etas[i].length; j++) {
+				System.out.printf(" %11f ", etas[i][j]);
+			}
+			System.out.println();
+		}
+		
 	}
 	
 	// Get the 9 values in previous state, x, xdot, xdotdot for i-1, i, i+1
