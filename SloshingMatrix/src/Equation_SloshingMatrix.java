@@ -54,7 +54,7 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
 
     // Calculate Fe
     public double getFe(double t){
-        return -m* OMEGA * 2 *(Math.sin(OMEGA*t));
+        return -m* (Math.pow(OMEGA, 2)) *(Math.sin(OMEGA*t));
     }
     
 
