@@ -43,7 +43,7 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
     public double getAlphaPlusBeta (double eta,double x0_dot, double x1_dot, double x0,double x1) {
     	double alpha, beta;
         alpha=0.5*  RHO * g *((eta*eta)+(2*eta*h));
-        beta=(0.33*RHO*(eta+h)*(eta+h)*(2*h*l*(x1_dot-x0_dot)*(x1_dot-x0_dot))/((x1-x0+l)*(x1-x0+l)*(x1-x0+l)));
+        beta=((1/3) *RHO*(eta+h)*(eta+h)*(2*h*l*(x1_dot-x0_dot)*(x1_dot-x0_dot))/((x1-x0+l)*(x1-x0+l)*(x1-x0+l)));
         return alpha + beta;
     }
     
@@ -68,7 +68,7 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
         double x0=previousX[0],x0_dot=previousX[1],x0_ddot=previousX[2];
         double x1=previousX[3],x1_dot=previousX[4],x1_ddot=previousX[5];
         double x2=previousX[6],x2_dot=previousX[7],x2_ddot=previousX[8];
-        ETA=getEta(x1_dot,x0);
+        ETA=getEta(x1,x0);
         alphaPlusBeta1=getAlphaPlusBeta(ETA,x0_dot,x1_dot,x0,x1);
         alphaPlusBeta2=getAlphaPlusBeta(ETA,x1_dot,x2_dot,x1,x2);
         fe=getFe(t);
