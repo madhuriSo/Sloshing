@@ -2,10 +2,10 @@ import org.apache.commons.math3.linear.*;
 
 public class Test_SloshingMatrix {
 	public static int N = 4; // use 4 for now  N = sloshingEquation.N;
+	public static Equation_SloshingMatrix sloshingEquation = new Equation_SloshingMatrix();
+	public static double[][] matrixData = new double[N-1][N-1]; // Matrix M
 
 	public static void main(String[] args) {
-
-		Equation_SloshingMatrix sloshingEquation = new Equation_SloshingMatrix();
 		
 		double t = 0;
 		double tMax = sloshingEquation.T_MAX;
@@ -22,10 +22,10 @@ public class Test_SloshingMatrix {
 		double[][] RKN_result = new double[50][3*(N+1)+1]; //[tMax/deltaT+1][3*(N+1)+1]
 		double[][] etas = new double[50][N+1]; // [tMax/deltaT+1][N+1]to store ETA
 		int indexRow = 0, indexCol = 3; // indexCol does not start from 0 since we need to leave columns for t and x0, xdot0, xdotdot0
-		double [] previousX = new double[9]; // For new equation, we are going to use less previous values. 
+		double [] previousX = new double[9]; // For new equation, we are not going to use all the nine values. 
 			
 		double[] fData = new double[N-1]; // to build vector F
-		double[][] matrixData = new double[N-1][N-1]; // Matrix M
+		//double[][] matrixData = new double[N-1][N-1]; // Matrix M
 		double[] xDDots = new double[N-1]; // to store xDDot for each time interval
 	
 		// t0, first row, initial states, all "0"
@@ -53,7 +53,7 @@ public class Test_SloshingMatrix {
 				
 				// previous x value for calculating ETA later
 				if (j == 1) {
-					xPrevious = 0; // for the first x, previous x value is 0
+					xPrevious = 0; // for the first ETA, previous x value is always 0
 				} else {
 					xPrevious = integratorRKN.y0; 
 				}				
@@ -84,20 +84,7 @@ public class Test_SloshingMatrix {
 
 				//solve new equations to get xDDot				
 				// fill in matrix M
-				double gammaCurrent = sloshingEquation.getGammaCurrent (previousX); // Gamma i
-				double gammaNext = sloshingEquation.getGammaNext (previousX); // Gamma i+1
-				if (j == 1) {
-					matrixData[j-1][0] = m + gammaCurrent + gammaNext;
-					matrixData[j-1][1] = - gammaNext;
-				} else if (j == (N-1)) {
-					matrixData[j-1][j-2] = - gammaCurrent;
-					matrixData[j-1][j-1] = m + gammaCurrent + gammaNext;
-				} else {
-					matrixData[j-1][j-2] = - gammaCurrent;
-					matrixData[j-1][j-1] = m + gammaCurrent + gammaNext;
-					matrixData[j-1][j] = - gammaNext;
-				}				
-
+				fillInMatrix (previousX, m, j);
 			}
 						
 			xDDots = solveLinearSystems (matrixData, fData);
@@ -172,6 +159,22 @@ public class Test_SloshingMatrix {
 		}
 		
 		return xValues;
+	}
+	
+	public static void fillInMatrix (double[] previousX, double m, int index) {
+		double gammaCurrent = sloshingEquation.getGammaCurrent (previousX); // Gamma i
+		double gammaNext = sloshingEquation.getGammaNext (previousX); // Gamma i+1
+		if (index == 1) {
+			matrixData[index-1][0] = m + gammaCurrent + gammaNext;
+			matrixData[index-1][1] = - gammaNext;
+		} else if (index == (N-1)) {
+			matrixData[index-1][index-2] = - gammaCurrent;
+			matrixData[index-1][index-1] = m + gammaCurrent + gammaNext;
+		} else {
+			matrixData[index-1][index-2] = - gammaCurrent;
+			matrixData[index-1][index-1] = m + gammaCurrent + gammaNext;
+			matrixData[index-1][index] = - gammaNext;
+		}
 	}
 	
 	// Solve linear systems using matrix
