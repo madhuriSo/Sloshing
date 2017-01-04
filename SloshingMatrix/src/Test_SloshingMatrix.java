@@ -120,7 +120,7 @@ public class Test_SloshingMatrix {
 			}
 			System.out.println();
 			toCSVfile(RKN_result, "x.csv");
-			System.out.println("CSV file created successfully in project folder!");
+			//System.out.println("CSV file created successfully in project folder!");
 		}
 		
 		
@@ -132,7 +132,7 @@ public class Test_SloshingMatrix {
 			}
 			System.out.println();
 			toCSVfile(etas, "etas.csv");
-			System.out.println("CSV file created successfully in project folder!");
+			//System.out.println("CSV file created successfully in project folder!");
 		}
 		
 	}
