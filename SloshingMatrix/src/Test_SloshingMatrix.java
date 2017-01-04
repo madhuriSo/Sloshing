@@ -128,7 +128,7 @@ public class Test_SloshingMatrix {
 		System.out.println("------------------------------------------------------------");		
 		for (int i=0; i<etas.length; i++) {
 			for (int j=0; j<etas[i].length; j++) {
-				System.out.printf(" %11f ", etas[i][j]);	
+				System.out.printf("%11f ", etas[i][j]);	
 			}
 			System.out.println();
 			toCSVfile(etas, "etas.csv");
