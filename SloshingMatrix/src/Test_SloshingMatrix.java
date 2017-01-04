@@ -1,3 +1,6 @@
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.apache.commons.math3.linear.*;
 
 public class Test_SloshingMatrix {
@@ -116,6 +119,7 @@ public class Test_SloshingMatrix {
 				System.out.printf(" %11f ", RKN_result[i][j]);
 			}
 			System.out.println();
+			toCSVfile(RKN_result, "x.csv");
 		}
 		
 		
@@ -123,12 +127,15 @@ public class Test_SloshingMatrix {
 		System.out.println("------------------------------------------------------------");		
 		for (int i=0; i<etas.length; i++) {
 			for (int j=0; j<etas[i].length; j++) {
-				System.out.printf(" %11f ", etas[i][j]);
+				System.out.printf(" %11f ", etas[i][j]);	
 			}
 			System.out.println();
+			toCSVfile(etas, "etas.csv");
+			
 		}
 		
 	}
+	
 	
 	// Get the 9 values in previous state, x, xdot, xdotdot for i-1, i, i+1
 	public static double[] getPreviousXValues (double[][] allValues, int currentRow, int currentNumOfX) {
@@ -197,5 +204,53 @@ public class Test_SloshingMatrix {
 		
 		return xDDot;
 	}
+	
+	private static void toCSVfile(double[][] value, String filename) 
+	{
+		//Delimiter used in CSV file
+				final String COMMA_DELIMITER = ","; // this was supposed t be declared as 'public static final'
+				final String NEW_LINE_SEPARATOR = "\n"; // this was supposed t be declared as 'public static final'
+				
+			    //Code to save output in csv file
+			    FileWriter fileWriter = null;
+			    
+			    //Code to save output in csv file
+			    
+				try
+				{
+					
+					fileWriter = new FileWriter(filename);
+					for (int i=0; i<value.length; i++) {
+						for (int j=0; j<value[i].length; j++) {
+//							System.out.printf(" %11f ", value[i][j]);
+							fileWriter.append(String.valueOf(value[i][j]));
+							fileWriter.append(COMMA_DELIMITER);
+						}
+						fileWriter.append(NEW_LINE_SEPARATOR);
+//						System.out.println();
+					}
+				}
+				catch (Exception e)
+		    	{
+		    		System.out.println("Error in CsvFileWriter!");
+		    		e.printStackTrace();
+		    	}
+		    		
+		    	finally 
+		    	{
+		    		try 
+		    		{
+		    			fileWriter.flush();
+		    			fileWriter.close();
+		    		} 
+		    		catch (IOException e) 
+		    		{
+		    				System.out.println("Error while flushing/closing fileWriter!");
+		                    e.printStackTrace();
+		    		}
+		    			
+			    } 
+				//System.out.println("CSV file created successfully in project folder!");
+			}
 	
 }
