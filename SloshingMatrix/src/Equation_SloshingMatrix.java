@@ -15,7 +15,7 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
 
     //Parameter of the tank
     double L=1.0;
-    double N=100;
+    int N=100;
     double l=(L/N);
 
     //Parameters for external vibrations
@@ -76,7 +76,27 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
         return f;
 	}
 	
-    // Calculat Gamma i
+	// Calculate Gamma i
+	public double getGammaCurrent (double[] previousX) {
+		double x0=previousX[0],x0_dot=previousX[1],x0_ddot=previousX[2];
+        double x1=previousX[3],x1_dot=previousX[4],x1_ddot=previousX[5];
+        double x2=previousX[6],x2_dot=previousX[7],x2_ddot=previousX[8];
+        ETA=getEta(x1,x0);
+        return (1/3)*RHO*h*l*((ETA+h)*(ETA+h))*(x1_ddot-x0_ddot)/((x1-x0+l)*(x1-x0+l));
+	}
+	
+	// Calculate Gamma i_1
+		public double getGammaNext (double[] previousX) {
+			double x0=previousX[0],x0_dot=previousX[1],x0_ddot=previousX[2];
+	        double x1=previousX[3],x1_dot=previousX[4],x1_ddot=previousX[5];
+	        double x2=previousX[6],x2_dot=previousX[7],x2_ddot=previousX[8];
+	        ETA=getEta(x2,x1);
+	        return (1/3)*RHO*h*l*((ETA+h)*(ETA+h))*(x2_ddot-x1_ddot)/((x2-x1+l)*(x2-x1+l));
+		}
+	
+	
+	/* In the following way, ETA has been substituted.
+    // Calculate Gamma i
     public double getGammaCurrent (double[] previousX) {
     	double x0=previousX[0],x0_dot=previousX[1],x0_ddot=previousX[2];
         double x1=previousX[3],x1_dot=previousX[4],x1_ddot=previousX[5];
@@ -84,12 +104,12 @@ public class Equation_SloshingMatrix implements SecondDerivative_SloshingMatrix 
     	return ( RHO * (Math.pow(h, 3)) * (Math.pow(l, 3)) ) / ( 3 * (Math.pow((x1 - x0 + l), 4)));
     }
     
- // Calculat Gamma i+1
+ // Calculate Gamma i+1
     public double getGammaNext (double[] previousX) {
     	double x0=previousX[0],x0_dot=previousX[1],x0_ddot=previousX[2];
         double x1=previousX[3],x1_dot=previousX[4],x1_ddot=previousX[5];
         double x2=previousX[6],x2_dot=previousX[7],x2_ddot=previousX[8];
     	return ( RHO * (Math.pow(h, 3)) * (Math.pow(l, 3)) ) / ( 3 * (Math.pow((x2 - x1 + l), 4)));
     }
-
+	*/
 }
