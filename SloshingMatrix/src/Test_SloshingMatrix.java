@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.apache.commons.math3.linear.*;
 
 public class Test_SloshingMatrix {
-	public static int N = 4; // use 4 for now  N = sloshingEquation.N;
 	public static Equation_SloshingMatrix sloshingEquation = new Equation_SloshingMatrix();
+	public static int N = sloshingEquation.N; // use 4 for now  N = sloshingEquation.N;
 	public static double[][] matrixData = new double[N-1][N-1]; // Matrix M
 
 	public static void main(String[] args) {
@@ -22,8 +22,8 @@ public class Test_SloshingMatrix {
 		SecondDerivative_SloshingMatrix secondDerivative = (SecondDerivative_SloshingMatrix) sloshingEquation;
 		IntegratorRKN_SloshingMatrix integratorRKN = new IntegratorRKN_SloshingMatrix (secondDerivative, t, x, xDot, deltaT, intermidiateXDDot);
 		
-		double[][] RKN_result = new double[50][3*(N+1)+1]; //[tMax/deltaT+1][3*(N+1)+1]
-		double[][] etas = new double[50][N+1]; // [tMax/deltaT+1][N+1]to store ETA
+		double[][] RKN_result = new double[(int)(tMax/deltaT)+1][3*(N+1)+1]; //[(int)(tMax/deltaT)+1][3*(N+1)+1]
+		double[][] etas = new double[(int)(tMax/deltaT)+1][N+1]; // [(int)(tMax/deltaT)+1][N+1]to store ETA
 		int indexRow = 0, indexCol = 3; // indexCol does not start from 0 since we need to leave columns for t and x0, xdot0, xdotdot0
 		double [] previousX = new double[9]; // For new equation, we are not going to use all the nine values. 
 			
@@ -43,7 +43,7 @@ public class Test_SloshingMatrix {
 		indexRow++; // go to the 2nd row	
 		double xPrevious; // to store previous x value which will be used to calculate ETA
 
-		for (int i = 1; i < 50; i++) {			
+		for (int i = 1; i <= (int)(tMax / deltaT); i++) {			
 			// Calculate all x, dx, d2x for each time interval
 			// i is hard coded for now, should be i <= tMax / deltaT
 			
@@ -107,8 +107,9 @@ public class Test_SloshingMatrix {
 
 		} 
 		
-		//System.out.println();
-		//System.out.println();
+		/*
+		System.out.println();
+		System.out.println();
 		
 		System.out.println("TEST, equation of motion");
 		System.out.println("     t,s           x0          x0dot       x0dotdot       x1          x1dot       x1dotdot       x2         x2dot        x2dotdot        x3        x3dot       x3dotdot         x4        x4dot        x4dotdot");
@@ -119,11 +120,13 @@ public class Test_SloshingMatrix {
 				System.out.printf(" %11f ", RKN_result[i][j]);
 			}
 			System.out.println();
-			toCSVfile(RKN_result, "x.csv");
+			//toCSVfile(RKN_result, "x.csv");
 			//System.out.println("CSV file created successfully in project folder!");
 		}
+		*/
+		toCSVfile(RKN_result, "x.csv");
 		
-		
+		/*
 		System.out.println("\n        t           eta1        eta2         eta3         eta4");
 		System.out.println("------------------------------------------------------------");		
 		for (int i=0; i<etas.length; i++) {
@@ -131,10 +134,11 @@ public class Test_SloshingMatrix {
 				System.out.printf(" %11f ", etas[i][j]);	
 			}
 			System.out.println();
-			toCSVfile(etas, "etas.csv");
+			//toCSVfile(etas, "etas.csv");
 			//System.out.println("CSV file created successfully in project folder!");
 		}
-		
+		*/
+		toCSVfile(etas, "etas.csv");
 	}
 	
 	
