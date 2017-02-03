@@ -9,28 +9,32 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
 public class SolveEquation_Method2 {
-	static int N = 50;
 	static EquationSloshingMatrix sloshingEquation = new EquationSloshingMatrix();
+	static int N = sloshingEquation.N;
 	public static double[][] matrixM = new double[N-1][N-1]; // Matrix M
 	
 	public static void main (String[] args) {
 		double t = 0;
-		double deltaT = 1.0 / 256;
-		int T_MAX = 20;
-		double m = sloshingEquation.m;
+		double deltaT = sloshingEquation.DELTA_T;
+		int T_MAX = sloshingEquation.T_MAX;
+		double m = sloshingEquation.m; // mass
 	
+		// for previous t
 		double[] xPrevious = new double[N+1];
 		double[] xDotPrevious = new double[N+1];
 		double[] xDDotPrevious = new double[N+1];
 		
+		// for current t
 		double[] x = new double[N+1];
 		double[] xDot = new double[N+1];
 		double[] xDDot = new double[N+1];
 	
+		// for RK4
 		double[] xPrime = new double[N+1];
 		double[] xDotPrime = new double[N+1];
 		double[] xDDotPrime = new double[N+1];
 	
+		// coefficients
 		double[] A_x = new double[N+1];
 		double[] A_xDot = new double[N+1];
 		double[] B_x = new double[N+1];
@@ -40,6 +44,9 @@ public class SolveEquation_Method2 {
 		double[] D_x = new double[N+1];
 		double[] D_xDot = new double[N+1];
 		
+		//previousX[]= {x_i-1,   x_i-1_dot,     x_i-1_doubleDot,  
+		//                     x_i,      xi_dot,          xi_doubleDot,   
+		//                     x_i+1,   x_i+1_dot,    x_i+1_doubleDot}
 		double[] previousX = new double[9];
 		double[] previousXPrime = new double[9];
 		
@@ -48,24 +55,28 @@ public class SolveEquation_Method2 {
 		double[][] allTs = new double[(int)(T_MAX/deltaT)+1][1];
 		int rowCounter = 0;
 		
-		double[] fData = new double[N-1]; // to build vector F
+		// vector F
+		double[] fData = new double[N-1];
 		
 		while (t <= T_MAX) {
-		//while (t <= 0.1) {
 			allTs[rowCounter][0] = t;
 			System.out.println("\nt: " + t);
 			
+			//******************************
+			//* Calculate coefficient A *
+			//******************************
 			//get A_x
+			// A_x[0], A_x[N] are always 0
 			for (int i = 0; i < N + 1; i++) {
 				A_x[i] = xDotPrevious[i];
 			}			
 			
 			//compute A_xDot
-			A_xDot[0] = 0;
+			//A_xDot[0], A_xDot[N] are always 0
 			for (int i = 1; i < N; i++) {
 				// get previousX
 				previousX = getPreviousX(i, xPrevious, xDotPrevious, xDDotPrevious);
-
+				
 				fData[i-1] = sloshingEquation.getValue(t, previousX);				
 				fillInMatrixM(previousX, m, i);
 			}			
@@ -73,11 +84,10 @@ public class SolveEquation_Method2 {
 			for (int i = 0; i < temp.length; i++) { // temp.length = N-1
 				A_xDot[i+1] = temp[i];
 			}
-			/*
-			System.out.println("F: " + fData[0] + "   " + fData[1]);
-			System.out.println("A_x: " + A_x[1] + "   " + A_x[2]);
-			System.out.println("A_xdot: " + A_xDot[1] + "   " + A_xDot[2]);
-			*/
+
+			//******************************
+			//* Calculate coefficient B *
+			//******************************
 			// compute B_x, B_xDot
 			// compute xPrime, xDotPrime, and get B_x
 			for (int i = 0; i < N; i++) {
@@ -91,7 +101,7 @@ public class SolveEquation_Method2 {
 			for (int i = 1; i < N; i++) {
 				// get previousXPrime
 				previousXPrime = getPreviousX(i, xPrime, xDotPrime, xDDotPrime);				
-
+				
 				fData[i-1] = sloshingEquation.getValue(t + deltaT / 2, previousXPrime);
 				fillInMatrixM(previousXPrime, m, i);
 			}			
@@ -99,26 +109,27 @@ public class SolveEquation_Method2 {
 			for (int i = 0; i < temp.length; i++) { // temp.length = N-1
 				B_xDot[i+1] = temp[i];
 			}
-			/*
-			System.out.println("F: " + fData[0] + "   " + fData[1]);
-			System.out.println("B_x: " + B_x[1] + "   " + B_x[2]);
-			System.out.println("B_xdot: " + B_xDot[1] + "   " + B_xDot[2]);
-			*/
+
+			//******************************
+			//* Calculate coefficient C *
+			//******************************
 			//compute C_x, C_xDot
 			// compute xPrime, xDotPrime, and get C_x
 			for (int i = 0; i < N; i++) {
 				xPrime[i] = xPrevious[i] + deltaT / 2 * B_x[i];
 				xDotPrime[i] = xDotPrevious[i] + deltaT / 2 * B_xDot[i];
 				C_x[i] = xDotPrime[i];
-			}		
+			}
 			
-
+			//******************************
+			//* Calculate coefficient C *
+			//******************************
 			// compute C_xDot
 			C_xDot[0] = 0;
 			for (int i = 1; i < N; i++) {
 				// get previousXPrime
 				previousXPrime = getPreviousX(i, xPrime, xDotPrime, xDDotPrime);
-
+				
 				fData[i-1] = sloshingEquation.getValue(t + deltaT / 2, previousXPrime);
 				fillInMatrixM(previousXPrime, m, i);
 			}
@@ -126,11 +137,10 @@ public class SolveEquation_Method2 {
 			for (int i = 0; i < temp.length; i++) { // temp.length = N-1
 				C_xDot[i+1] = temp[i];
 			}
-			/*
-			System.out.println("F: " + fData[0] + "   " + fData[1]);
-			System.out.println("C_x: " + C_x[1] + "   " + C_x[2]);
-			System.out.println("C_xdot: " + C_xDot[1] + "   " + C_xDot[2]);
-			*/
+
+			//******************************
+			//* Calculate coefficient D *
+			//******************************
 			//compute D_x, D_xDot
 			// compute xPrime, xDotPrime, get D_x
 			for (int i = 0; i < N; i++) {
@@ -138,13 +148,13 @@ public class SolveEquation_Method2 {
 				xDotPrime[i] = xDotPrevious[i] + deltaT * C_xDot[i];
 				D_x[i] = xDotPrime[i];
 			}
-			
+
 			// compute D_xDot
 			D_xDot[0] = 0;
 			for (int i = 1; i < N; i++) {
 				// get previousXPrime
 				previousXPrime = getPreviousX (i, xPrime, xDotPrime, xDDotPrime);
-					
+										
 				fData[i-1] = sloshingEquation.getValue(t + deltaT, previousXPrime);
 				fillInMatrixM(previousXPrime, m, i);
 			}
@@ -152,19 +162,16 @@ public class SolveEquation_Method2 {
 			for (int i = 0; i < temp.length; i++) { // temp.length = N-1
 				D_xDot[i+1] = temp[i];
 			}
-			/*
-			System.out.println("F: " + fData[0] + "   " + fData[1]);
-			System.out.println("D_xdot: " + D_x[1] + "   " + D_x[2]);
-			System.out.println("D_xdot: " + D_xDot[1] + "   " + D_xDot[2]);
-			*/
 			
 			// compute current x, xDot
 			for (int n = 0; n < N + 1; n++) {
 				x[n] = xPrevious[n] + deltaT / 6 * (A_x[n] + 2*B_x[n] + 2*C_x[n] + D_x[n]);
-				xDot[n] = xPrevious[n] + deltaT / 6 * (A_xDot[n] + 2*B_xDot[n] + 2*C_xDot[n] + D_xDot[n]);
+				xDot[n] = xDotPrevious[n] + deltaT / 6 * (A_xDot[n] + 2*B_xDot[n] + 2*C_xDot[n] + D_xDot[n]);
 			}
-			
-			// compute current xDDot
+
+			//********************************
+			//* Calculate current xDDot *
+			//********************************
 			xDDot[0] = 0;
 			for (int i = 1; i < N; i++) {
 				// get current x, xDot and previous xDDot
@@ -174,27 +181,30 @@ public class SolveEquation_Method2 {
 			}
 			xDDot[N] = 0;
 			
-			//System.out.println("x:" + "  " + x[0] + "  " + x[1] + "  " + x[2] + "  " + x[3] + "  " + x[4]);
-			//System.out.println("xDot:" + "  " + xDot[0] + "  " + xDot[1] + "  " + xDot[2] + "  " + xDot[3] + "  " + xDot[4]);
+			//********************************
+			//* Calculate eta                  *
+			//********************************
+			for (int i = 1; i < N + 1; i++) {
+				double eta = sloshingEquation.getEta(x[i], x[i-1]);
+				etas[rowCounter][0] = allTs[rowCounter][0];
+				etas[rowCounter][i] = eta;
+				if (i==3)
+				System.out.println("eta: " + eta);
+			}
 			
+			//*************************************
+			//* Save and output to csv files  *
+			//*************************************
 			// store all results into 2D array
 			for (int i = 0; i < N + 1; i++) {
 				allXResult[rowCounter][0] = allTs[rowCounter][0];
 				allXResult[rowCounter][i * 3 + 1] = x[i];
 				allXResult[rowCounter][i * 3 + 2] = xDot[i];
 				allXResult[rowCounter][i * 3 + 3] = xDDot[i];
-			}			
-			
-			// compute eta
-			for (int i = 1; i < N + 1; i++) {
-				double eta = sloshingEquation.getEta(x[i], x[i-1]);
-				etas[rowCounter][0] = allTs[rowCounter][0];
-				etas[rowCounter][i] = eta;
-			}
-			
+			}	
 			// output to csv files
-			toCSVfile(allXResult, "x.csv");
-			toCSVfile(etas, "etas.csv");
+			toCSVfile(allXResult, "allX_newMethod.csv");
+			toCSVfile(etas, "etas_newMethod.csv");
 			
 			// update
 			rowCounter++;
@@ -203,28 +213,31 @@ public class SolveEquation_Method2 {
 				xPrevious[i] = x[i];
 				xDotPrevious[i] = xDot[i];
 				xDDotPrevious[i] = xDDot[i];
-			}
-			
-		} // end of while 
-		
+			}			
+		} // end of while 		
 	} // end of main
 	
-	public static double[] getPreviousX (int currentNumOfX, double[] xPrevious, 
+	//Get previous x, xdot, xddot
+	//Return previousX[]= {x_i-1,   x_i-1_dot,     x_i-1_doubleDot,  
+	//                                 x_i,      xi_dot,          xi_doubleDot,   
+	//                                 x_i+1,   x_i+1_dot,    x_i+1_doubleDot}
+	public static double[] getPreviousX (int i, double[] xPrevious, 
             													double[] xDotPrevious, double[] xDDotPrevious) {
 		double[] previousX = new double[9];
-		previousX[0] = xPrevious[currentNumOfX-1];
-		previousX[1] = xDotPrevious[currentNumOfX-1];
-		previousX[2] = xDDotPrevious[currentNumOfX-1];
-		previousX[3] = xPrevious[currentNumOfX];
-		previousX[4] = xDotPrevious[currentNumOfX];
-		previousX[5] = xDDotPrevious[currentNumOfX];
-		previousX[6] = xPrevious[currentNumOfX+1];
-		previousX[7] = xDotPrevious[currentNumOfX+1];
-		previousX[8] = xDDotPrevious[currentNumOfX+1];
+		previousX[0] = xPrevious[i-1];
+		previousX[1] = xDotPrevious[i-1];
+		previousX[2] = xDDotPrevious[i-1];
+		previousX[3] = xPrevious[i];
+		previousX[4] = xDotPrevious[i];
+		previousX[5] = xDDotPrevious[i];
+		previousX[6] = xPrevious[i+1];
+		previousX[7] = xDotPrevious[i+1];
+		previousX[8] = xDDotPrevious[i+1];
 
 		return previousX;
 	}
 	
+	// Get matrix M for each i
 	public static void fillInMatrixM (double[] previousX, double m, int index) {
 		double gammaCurrent = sloshingEquation.getGammaCurrent (previousX); // Gamma i
 		double gammaNext = sloshingEquation.getGammaNext (previousX); // Gamma i+1
@@ -262,6 +275,7 @@ public class SolveEquation_Method2 {
 		return xDDot;
 	}
 	
+	// Save 2D array to csv file
 	private static void toCSVfile(double[][] value, String filename) 
 	{
 		//Delimiter used in CSV file
@@ -277,31 +291,29 @@ public class SolveEquation_Method2 {
 				{
 					
 					fileWriter = new FileWriter(filename);
-					/*
 					for (int i=0; i<value.length; i++) {
 						for (int j=0; j<value[i].length; j++) {
-//							System.out.printf(" %11f ", value[i][j]);
+							//System.out.printf(" %11f ", value[i][j]);
 							fileWriter.append(String.valueOf(value[i][j]));
 							fileWriter.append(COMMA_DELIMITER);
 						}
 						fileWriter.append(NEW_LINE_SEPARATOR);
-//						System.out.println();
+						//System.out.println();
 					}
-					*/
 					
-					// temporarily only store eta_3
+					/* only output eta3
 					for (int i=0; i<value.length; i++) {
 						//for (int j=0; j<value[i].length; j++) {
-//							System.out.printf(" %11f ", value[i][j]);
+							//System.out.printf(" %11f ", value[i][j]);
 							fileWriter.append(String.valueOf(value[i][0]));
 							fileWriter.append(COMMA_DELIMITER);
 							fileWriter.append(String.valueOf(value[i][3]));
 							fileWriter.append(COMMA_DELIMITER);
 						//}
 						fileWriter.append(NEW_LINE_SEPARATOR);
-//						System.out.println();
+						//System.out.println();
 					}
-					
+					*/
 				}
 				catch (Exception e)
 		    	{
