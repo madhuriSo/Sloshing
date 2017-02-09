@@ -1,3 +1,7 @@
+package NewImplementation.src;
+
+
+
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -11,13 +15,25 @@ import org.apache.commons.math3.linear.RealVector;
 public class SolveEquation_Method2 {
 	static EquationSloshingMatrix sloshingEquation = new EquationSloshingMatrix();
 	static int N = sloshingEquation.N;
-	public static double[][] matrixM = new double[N-1][N-1]; // Matrix M
+	public static double[][] matrixM = new double[N-1][N-1]; // Matrix M -- 
 	
 	public static void main (String[] args) {
+		
+		if (args.length==0){
+			System.out.println("Code executed from eclipse");
+			sloshingEquation.parseFile("./config.dat"); // we can specify any relative/absolute path here
+			
+		}
+		else
+		{
+			sloshingEquation.parseFile(args[0]); //config.dat -- if running code from eclipse
+		}
 		double t = 0;
 		double deltaT = sloshingEquation.DELTA_T;
 		int T_MAX = sloshingEquation.T_MAX;
 		double m = sloshingEquation.m; // mass
+		
+		
 	
 		// for previous t
 		double[] xPrevious = new double[N+1];
@@ -204,7 +220,13 @@ public class SolveEquation_Method2 {
 			}	
 			// output to csv files
 			toCSVfile(allXResult, "allX_newMethod.csv");
-			toCSVfile(etas, "etas_newMethod.csv");
+			if (args.length==0) {
+				toCSVfile(etas, "./o etas_newMethod.csv"); //any relative/absolute path
+				
+			} else {
+				toCSVfile(etas, args[1]); //etas_newMethod.csv	
+			}
+			
 			
 			// update
 			rowCounter++;
@@ -214,7 +236,7 @@ public class SolveEquation_Method2 {
 				xDotPrevious[i] = xDot[i];
 				xDDotPrevious[i] = xDDot[i];
 			}			
-		} // end of while 		
+		} // end of while 
 	} // end of main
 	
 	//Get previous x, xdot, xddot

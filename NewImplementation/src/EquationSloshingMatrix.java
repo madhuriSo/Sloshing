@@ -1,25 +1,35 @@
+package NewImplementation.src;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 public class EquationSloshingMatrix {
     //this parameter is not configurable
-    double g=9.81;
+	public static double g=9.81;
 
     //Parameters of liquid
-    double RHO=1000.0;
-    double MU=0.00152;
-    double h=0.05;
-    double ZETA=0.07;
+	public static double RHO=1000.0;
+	public static double MU=0.00152;
+	public static double h=0.05;
+	public static double ZETA=0.07;
 
     //Parameters of liquid with respect to time
-    int T_MAX=60;
-    double DELTA_T=1.0/256;
+	public static int T_MAX=60;
+	public static double DELTA_T=1.0/256;
 
     //Parameter of the tank
-    double L=1.0;
-    int N=50;
-    double l=(L/N);
+	public static double L=1.0;
+	public static int N=50;
+	double l=(L/N);
 
     //Parameters for external vibrations
-    double A=0.0035;
-    double F_REQ=0.386;
+	public static double A=0.0035;
+	public static double F_REQ=0.386;
 
     double m = 0; 		// to be initialized
     double cc = 0 ;		//damping coeff
@@ -99,4 +109,73 @@ public class EquationSloshingMatrix {
 	        double gamma = (1.0/3)*RHO*h*l*((ETA+h)*(ETA+h))/((x2-x1+l)*(x2-x1+l));
 	        return gamma;
 		}
+		
+	//Load values from configuration file
+		
+	public  void parseFile(String filename) 
+	{
+//			public static void main(String[] args) {
+			Properties prop = new Properties();
+			BufferedReader input = null;
+			try 
+			{
+				input = new BufferedReader(new FileReader(filename));		
+				// load a properties file
+				prop.load(input);
+				
+				 for ( String line; null != ( line = input.readLine() );  ) 
+			        {
+			        	if ("".equals( line.trim() ) ||line.startsWith( "*" ))
+			                return;
+			        }
+
+				
+				// get the property value and print it out
+//				System.out.println(prop.getProperty("g"));
+//				System.out.println(prop.getProperty("RHO"));
+//				System.out.println(prop.getProperty("MU"));
+//				System.out.println(prop.getProperty("h"));
+//				System.out.println(prop.getProperty("ZETA"));
+//				System.out.println(prop.getProperty("T_MAX"));
+//				System.out.println(prop.getProperty("DELTA_T"));
+//				System.out.println(prop.getProperty("L"));
+//				System.out.println(prop.getProperty("N"));
+//				System.out.println(prop.getProperty("A"));
+//				System.out.println(prop.getProperty("F_REQ"));
+				g=Double.parseDouble(prop.getProperty("g"));
+				RHO=Double.parseDouble(prop.getProperty("RHO"));
+				MU=Double.parseDouble(prop.getProperty("MU"));
+				h=Double.parseDouble(prop.getProperty("h"));
+				ZETA=Double.parseDouble(prop.getProperty("ZETA"));
+				T_MAX=Integer.parseInt(prop.getProperty("T_MAX"));
+				DELTA_T=Double.parseDouble(prop.getProperty("DELTA_T"));
+				L=Double.parseDouble(prop.getProperty("L"));
+				N=Integer.parseInt(prop.getProperty("N"));
+				A=Double.parseDouble(prop.getProperty("A"));
+				F_REQ=Double.parseDouble(prop.getProperty("F_REQ"));
+				//System.out.println(DELTA_T);
+			}  
+			catch (FileNotFoundException e) 
+			{
+				e.printStackTrace();
+			} 
+			catch (IOException ex) 
+			{
+				ex.printStackTrace();
+			} 
+			finally 
+			{
+				if (input != null)
+				{
+					try 
+					{
+						input.close();
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+	}
 }
