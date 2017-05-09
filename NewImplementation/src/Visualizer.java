@@ -46,7 +46,7 @@ public class Visualizer {
         }
 
         int i=2;
-        while(i<20480){
+        while(floatVal.get(i)!=null){
             //Update chart
             currentval=floatVal.get(i);
             chart.updateXYSeries("Water Level",location,currentval,null);
